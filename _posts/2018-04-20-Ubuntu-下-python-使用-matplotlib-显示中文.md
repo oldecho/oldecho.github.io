@@ -2,11 +2,13 @@
 title: Ubuntu 下 python 使用 matplotlib 显示中文
 date: 2018-04-20 15:20:15
 categories:
-- Foo
-tags:
+- python
+tags: python, matplotlib
 ---
 
 Windows 下有中文字体，直接设置参数即可，Linux 需要自己添加中文字体。
+
+开发环境：python 2
 
 ## 查看 matplotlib 是否有中文字体
 
