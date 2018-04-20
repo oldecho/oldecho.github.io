@@ -6,7 +6,7 @@ categories:
 tags:
 ---
 
-
+Windows 下有中文字体，直接设置参数即可，Linux 需要自己添加中文字体。
 
 ## 查看 matplotlib 是否有中文字体
 
