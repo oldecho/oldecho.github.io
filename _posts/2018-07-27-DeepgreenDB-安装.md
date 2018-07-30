@@ -1,7 +1,6 @@
 ---
 title: DeepgreenDB 集群搭建
 date: 2018-07-27 07:07:07
-link: https://yq.aliyun.com/articles/98584?t=t1
 categories:
 - Greenplum
 tags:
