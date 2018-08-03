@@ -4,12 +4,11 @@ date: 2018-07-27 07:07:07
 categories:
 - Greenplum
 tags:
-- Greenplum
 - Deepgreen
 - 集群搭建
 ---
 
-DeepgreenDB 集群搭建
+# DeepgreenDB 集群搭建
 
 系统版本：CentOS 7.2 KVM
 
@@ -107,28 +106,34 @@ source ~/.bashrc
 
 ```shell
 cd 
-mkdir dgconfig
-vi dgconfig/hostfile_exkeys
+mkdir dgconfigs
 # 包含了集群所有主机的网口对应的主机名（因为有可能是双网卡的服务器）
-vi dgconfig/host_file
+vi dgconfigs/hostfile_exkeys
 # 包含了集群所有主机名
-vi dgconfig/hostfile_segonly
+vi dgconfigs/hostfile
 # 包含了所有segment主机名
+vi dgconfigs/hostfile_segonly
 ```
 
 使用 gpssh-exkeys 建立通信
 
-```
-gpssh-exkeys -f /home/dgadmin/dgconfig/hostfile_exkeys
+```shell
+gpssh-exkeys -f /home/dgadmin/dgconfigs/hostfile_exkeys
 ```
 
 ### 安装软件到各个节点
 
 ```shell
-gpssh -f /home/dgadmin/dgconfig/hostfile_exkeys -e ls -l $GPHOME
+gpseginstall -f /home/dgadmin/dgconfigs/hostfile_exkeys -u dgadmin
+# check
+gpssh -f /home/dgadmin/dgconfigs/hostfile_exkeys -e ls -l $GPHOME
 ```
 
-### 检查主机参数配置 -- 此处可以在配置系统环境时先配置好
+### 检查主机参数配置
+
+此处可以在配置系统环境时先配置好
+
+实际未做此优化，测试中未看到效果，后续再研究
 
 ```shell
 gpcheck -h hostname
@@ -233,7 +238,7 @@ chown -R dgadmin /data/dgdata
 在 `$GPHOME/docs/cli_help/gpconfigs` 下有一些模板，如： `gpinitsystem_config` 
 
 ```shell
-cp $GPHOME/docs/cli_help/gpconfigs/gpinitsystem_config ~/dgconfig/
+cp $GPHOME/docs/cli_help/gpconfigs/gpinitsystem_config ~/dgconfigs/
 vi ~/dgconfig/gpinitsystem_config
 
 # FILE NAME: gpinitsystem_config
@@ -314,7 +319,7 @@ DATABASE_NAME=init_with_this_database
 
 #### Specify the location of the host address file here instead of
 #### with the the -h option of gpinitsystem.
-MACHINE_LIST_FILE=/home/dgadmin/dgconfig/hostfile_segonly
+MACHINE_LIST_FILE=/home/dgadmin/dgconfigs/hostfile_segonly
 
 # Hosts to allow to connect to the QD (and Segment Instances)
 # By default, allow everyone to connect (0.0.0.0/0)
@@ -325,7 +330,6 @@ export TRUSTED_SHELL
 
 # Keep max_connection settings to reasonable values for
 # installcheck good execution.
-
 DEFAULT_QD_MAX_CONNECT=25
 QE_CONNECT_FACTOR=5
 ```
@@ -340,7 +344,7 @@ gpinitsystem -c gpinitsystem_config -s [standby_hostname]
 
 ```shell
 vim greenplum_path.sh
-export MASTER_DATA_DIRECTORY=/dgdata/master/gpseg-1
+export MASTER_DATA_DIRECTORY=/data/dgdata/master/gpseg-1
 export PGPORT=5432
 export PGDATABASE=[database]  # 使用 psql 进入时的默认数据库
 ```
@@ -363,3 +367,16 @@ role 和 preferred_role 应该一致
 mode 全为 s
 
 status 全为 u
+
+## 配置远程访问
+
+```shell
+# 修改 master 节点的数据库文件，添加远程访问ip及权限
+vi /data/dgdata/master/gpseg-1/pg_hba.conf
+host    all     dgadmin         10.10.0.0/16    md5
+
+# 给 dgadmin 用户添加密码
+psql
+alter role dgadmin with password '...';
+```
+
