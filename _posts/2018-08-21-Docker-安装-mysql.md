@@ -40,3 +40,11 @@ mysql> grant all privileges on *.* to root@'%' identified by 'passwd' with grant
 mysql> flush privileges;
 ```
 
+需要修改 mysql 配置文件，但是在使用 docker 容器时，有时候里边没有安装vi，敲vi命令时提示说：vi: command not found，这个时候就需要安装  `apt-get install vi` 
+
+提示 `E: Unable to locate package vi`
+
+输入 `apt-get update` 作用是同步 /etc/apt/sources.list 和 /etc/apt/sources.list.d 中列出的源的索引，这样才能获取到最新的软件包。  
+
+再次 `apt-get install vi` 即可
+
